@@ -9,7 +9,7 @@ namespace TF\Logger\Handlers;
 /**
  * Interface ILogHandler
  *
- * todo add comment and PHPDoc info  for this interace
+ * todo add comment and PHPDoc info  for this interface
  */
 interface ILogHandler {
 

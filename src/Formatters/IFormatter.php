@@ -10,7 +10,7 @@ namespace TF\Logger\Formatters;
 /**
  * Interface IFormatter
  *
- * todo add comment and PHPDoc info  for this interace
+ * todo add comment and PHPDoc info  for this interface
  */
 interface IFormatter {
 

@@ -6,6 +6,7 @@
  * Date: 15.03.2016
  */
 namespace TF\Logger\Handlers;
+
 use TF\Logger\Formatters\IFormatter;
 
 /**
@@ -14,7 +15,7 @@ use TF\Logger\Formatters\IFormatter;
  *
  * todo add comment and PHPDoc info  for this class
  */
-class FileLogHandler  implements ILogHandler{
+class FileLogHandler  implements ILogHandler {
 
     /** @var string $logsDir */
     private $logsDir ='';
