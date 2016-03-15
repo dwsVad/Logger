@@ -1,90 +1,148 @@
 <?php
-namespace TF\Libs\Logger;
+/**
+ * This file is part of the Lib: TF\Logger
+ * Copyright (c) 2016 Protsenko Vadim (DWSVad email://dws.vad@gmail.com) (http://TimFamily.Kiev.ua)
+ *
+ * Date: 09.03.2016
+ */
+namespace TF\Logger;
 
-class Logger
-{
-    const ERROR = 1;
-    const WARNING = 3;
-    const INFO = 8;
-    const TRACE = 9;
+use TF\Logger\Handlers\ILogHandler;
 
+/**
+ * Class Logger
+ * @package TF\Libs\Logger
+ *
+ * Basic usage:
+ * Initialise:
+ *          $logsDir='';
+ *          Logger::addHandler(new FileLogHandler(new DefaultFileLogFormatter(),$logsDir));
+ * Usage samples:
+ * 1.
+ *          Logger::getLogger('moduleName1')->log("message",Logger::WARNING);
+ * 2.
+ *          Logger::getLogger('moduleName2')->warning('log message');
+ * 3.
+ *          $loggerModule3 = Logger::getLogger('moduleName3');
+ *          $loggerModule3->log('log message',Logger::WARNING);
+ * 4.
+ *          $loggerModule4 = Logger::getLogger('moduleName4');
+ *          $loggerModule4->warning('log message');
+ */
+class Logger {
+    const NONE = 0;
+    const CRITICAL = 1;
+    const WARNING  = 2;
+    const INFO  = 3;
+    const TRACE = 4;
+    const DEBUG = 5;
+
+    /** @var int $globalLogLevel */
+    private static $globalLogLevel = self::DEBUG;
     /** @var Logger[] */
-    protected static  $_logs = array();
+    private static $loggersMap = array();
 
-    protected static  $_logLevels = array(
-        self::ERROR => 'Error',
-        self::WARNING => 'Warning',
-        self::INFO => 'Info',
-        self::TRACE => 'Trace'
-    );
-    protected static $logsDir = null;
+    /** @var ILogHandler[] */
+    private static $logHandlers = array();
 
-    private $loggerName;
-    private $logPatch;
+    /** @var string $moduleName */
+    private $moduleName;
 
+    /** @var int $moduleLogLevel */
+    private $moduleLogLevel;
 
-    public static function setDir($dirPath) {
-        self::$logsDir = $dirPath;
-        if (!is_writable(self::$logsDir))
-            throw new \RuntimeException("Logs dir not writable");
-    }
-
-    public static function getLogger($loggerName) {
-        if (!array_key_exists($loggerName, self::$_logs)) {
-            $log = new Logger($loggerName);
-            self::$_logs[$loggerName] = $log;
-        }
-
-        return self::$_logs[$loggerName];
+    /**
+     * todo add comment and PHPDoc info  for this method
+     *
+     * Logger constructor.
+     * @param string $moduleName
+     * @param int $moduleLogLevel
+     */
+    private function __construct($moduleName, $moduleLogLevel) {
+        $this->moduleLogLevel = $moduleLogLevel;
+        $this->moduleName = $moduleName;
     }
 
     /**
-     * @param $loggerName
-     * @throws \RuntimeException
+     * todo add comment and PHPDoc info  for this function
+     *
+     * @param string $module
+     * @return Logger
      */
-    public function __construct($loggerName) {
-        $this->loggerName = $loggerName;
+    public static function getLogger($module = 'core') {
+        if(!array_key_exists($module,self::$loggersMap))
+            self::$loggersMap[$module] = new Logger($module,self::$globalLogLevel);
 
-        if(is_null(self::$logsDir))
-            throw new \RuntimeException("Logs dir not initialised");
+        return self::$loggersMap[$module];
+    }
 
-        $this->logPatch =  self::$logsDir . DIRECTORY_SEPARATOR . $loggerName . '.log';
+    /**
+     * todo add comment and PHPDoc info  for this function
+     *
+     * @param ILogHandler $logHandler
+     */
+    public static function addHandler(ILogHandler $logHandler) {
+        self::$logHandlers[] = $logHandler;
     }
 
 
-    public function log($msg, $logLevel = self::INFO)
-    {
-        $logMessage = self::formatLogMessage($msg,$logLevel);
-        file_put_contents( $this->logPatch, $logMessage, FILE_APPEND );
+    /**
+     * todo add comment and PHPDoc info  for this function
+     *
+     * @param $message
+     * @param int $logLevel
+     */
+    public function log($message, $logLevel = self::DEBUG) {
+        if($logLevel <= $this->moduleLogLevel) {
+            foreach(self::$logHandlers as $appender) {
+                $appender->save($this->moduleName,$message,$logLevel);
+            }
+        }
+
     }
 
-
-    public function error($msg) {
-        $this->log($msg,self::ERROR);
+    /**
+     * todo add comment and PHPDoc info  for this function
+     *
+     * @param $message
+     */
+    public function warning($message){
+        $this->log($message, self::WARNING);
     }
 
-
-    public function warning($msg) {
-        $this->log($msg,self::WARNING);
+    /**
+     * todo add comment and PHPDoc info  for this function
+     *
+     * @param $message
+     */
+    public function critical($message){
+        $this->log($message, self::CRITICAL);
     }
 
-
-    public function info($msg) {
-        $this->log($msg,self::INFO);
+    /**
+     * todo add comment and PHPDoc info  for this function
+     *
+     * @param $message
+     */
+    public function info($message){
+        $this->log($message, self::INFO);
     }
 
-
-    public function trace($msg) {
-        $this->log($msg,self::TRACE);
+    /**
+     * todo add comment and PHPDoc info  for this function
+     *
+     * @param $message
+     */
+    public function trace($message){
+        $this->log($message, self::TRACE);
     }
 
-
-    private static function formatLogMessage($msg,$logLevel){
-        return sprintf("[%s] [%s] [%d] [%s]\n",
-            date('Y-m-d H:i:s'),
-            self::$_logLevels[$logLevel],
-            getmypid(),
-            $msg
-        );
+    /**
+     * todo add comment and PHPDoc info  for this function
+     *
+     * @param $message
+     */
+    public function debug($message){
+        $this->log($message, self::DEBUG);
     }
 }
