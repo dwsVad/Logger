@@ -18,7 +18,7 @@ interface IFormatter {
      * todo add comment and PHPDoc info  for this function
      *
      * @param $message
-     * @param int $level
+     * @param string $level
      * @return string
      */
     public function format($message,$level);

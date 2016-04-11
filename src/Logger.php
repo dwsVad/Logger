@@ -37,6 +37,15 @@ class Logger {
     const TRACE = 4;
     const DEBUG = 5;
 
+    private static $levels = array(
+        0 => 'NONE',
+        1 => 'CRITICAL',
+        2 => 'WARNING',
+        3 => 'INFO',
+        4 => 'TRACE',
+        5 => 'DEBUG'
+    );
+
     /** @var int $globalLogLevel */
     private static $globalLogLevel = self::DEBUG;
     /** @var Logger[] */
@@ -95,7 +104,7 @@ class Logger {
     public function log($message, $logLevel = self::DEBUG) {
         if($logLevel <= $this->moduleLogLevel) {
             foreach(self::$logHandlers as $appender) {
-                $appender->save($this->moduleName,$message,$logLevel);
+                $appender->save($this->moduleName,$message,self::getLogLevelName($logLevel));
             }
         }
 
@@ -144,5 +153,15 @@ class Logger {
      */
     public function debug($message){
         $this->log($message, self::DEBUG);
+    }
+
+    /**
+     * todo add comment and PHPDoc info  for this function
+     *
+     * @param $codeLevel
+     * @return mixed
+     */
+    private static function getLogLevelName($codeLevel) {
+        return self::$levels[$codeLevel];
     }
 }

@@ -18,7 +18,7 @@ interface ILogHandler {
      *
      * @param string $module
      * @param $message
-     * @param int $level
+     * @param string $level
      * @return boolean
      */
     public function save($module,$message,$level);

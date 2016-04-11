@@ -24,7 +24,7 @@ class FileLogHandler  implements ILogHandler {
     private $logsExtension = '.log';
 
     /** @var int $logSizeLimit in bytes */
-    private $logSizeLimit = 1024;
+    private $logSizeLimit = 1048576; // 1Mb
 
     /** @var  IFormatter */
     private $formatter;
@@ -46,7 +46,7 @@ class FileLogHandler  implements ILogHandler {
      *
      * @param string $module
      * @param $message
-     * @param int $level
+     * @param string $level
      * @return bool
      */
     public function save($module, $message, $level) {
