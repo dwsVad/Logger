@@ -23,7 +23,7 @@ class DefaultFileLogFormatter implements IFormatter {
      * @return string
      */
     public function format($message,$level) {
-        return '['.date("y-m-d H:i:s").'] ['.$level.'] '.$message."\n";
+        return '['.date("y-m-d H:i:s").'] ['.$level.'] ('.getmypid().') '.$message."\n";
     }
 
 }
