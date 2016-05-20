@@ -29,16 +29,20 @@ class FileLogHandler  implements ILogHandler {
     /** @var  IFormatter */
     private $formatter;
 
+    private $isRotatable;
+
     /**
      * todo add comment and PHPDoc info  for this method
      *
      * FileLogHandler constructor.
      * @param IFormatter $formatter
      * @param $logsDir
+     * @param bool $isRotatable
      */
-    public function __construct(IFormatter $formatter,$logsDir) {
+    public function __construct(IFormatter $formatter, $logsDir, $isRotatable = true) {
         $this->formatter = $formatter;
         $this->logsDir = $logsDir;
+        $this->isRotatable = $isRotatable;
     }
 
     /**
@@ -63,7 +67,7 @@ class FileLogHandler  implements ILogHandler {
             return false;
 
         }
-        if((file_exists($logFile) && filesize($logFile) > $this->logSizeLimit))
+        if($this->isRotatable && (file_exists($logFile) && filesize($logFile) > $this->logSizeLimit))
             $this->rotateLogFile($logFile);
 
         return $this->write($logFile,$formattedLogLine);
